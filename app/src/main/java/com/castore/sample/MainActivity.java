@@ -1,4 +1,4 @@
-package com.harmonie.castorev2;
+package com.castore.sample;
 
 
 import android.app.AlertDialog;
@@ -23,10 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import fr.creditagricole.simone.dataprovider.dto.json.AgenceDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.CompteBAMDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.CompteDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.OperationDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.UtilisateurDTO;
+import fr.creditagricole.simone.dataprovider.geolocalisation.dto.json.AgencesDTO;
 import oauth.signpost.OAuthProvider;
 import oauth.signpost.basic.DefaultOAuthProvider;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
@@ -59,6 +62,7 @@ public class MainActivity extends Activity {
     private CompteBAMDTOList comptesBAMDTO;
     private CompteDTOList comptesDTO;
     private OperationDTOList operationsDTO;
+    private AgencesDTO agencesDTO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +147,7 @@ public class MainActivity extends Activity {
         myWebView.setVisibility(View.VISIBLE);
 
         /* ICS n’autorise  pas les requêtes HTTP dans le UI thread (sinon erreur "Communication with the service provider failed"
-        * StrictMode.enableDefaults() permet de contourner le problème, mais il faudrait privilégier l'appel des fonctions "DefaultOAuthProvider"
+        * Dans le cadre de l'exemple, on utilise StrictMode.enableDefaults() pour contourner le problème, mais nous conseillons de privilégier l'appel des fonctions "DefaultOAuthProvider"
         * et "CommonsHttpOAuthConsumer" dans un thread parallèle*/
         StrictMode.enableDefaults();
 
@@ -187,7 +191,8 @@ public class MainActivity extends Activity {
             utilisateurDTO = mapper.readValue(responseString, UtilisateurDTO.class);
             if(utilisateurDTO != null)
             {
-                showAlertDialog("Utilisateur",responseString);
+                showAlertDialog("Utilisateur",  "Id : " + utilisateurDTO.getId()+
+                        "\nIdentifiant : " + utilisateurDTO.getIdentifiant());
             }
         } catch (IOException e) {e.printStackTrace();}
     }
@@ -204,7 +209,8 @@ public class MainActivity extends Activity {
                 comptesDTO = mapper.readValue(compteResString, CompteDTOList.class);
                 if(comptesDTO != null)
                 {
-                    showAlertDialog("Comptes", compteResString);
+                    showAlertDialog("Comptes", "Nom : " + comptesDTO.getCompteDTOs().get(0).getAlias() +
+                        "\nGroupe : " + comptesDTO.getCompteDTOs().get(0).getGroupe() + " \nSolde : " + comptesDTO.getCompteDTOs().get(0).getSolde());
                 }
             }
         } catch (IOException e) {e.printStackTrace();}
@@ -219,7 +225,9 @@ public class MainActivity extends Activity {
             operationsDTO= mapper.readValue(responseString, OperationDTOList.class);
             if(operationsDTO != null)
             {
-                showAlertDialog("Operations", responseString);
+                showAlertDialog("Operations", "Date : " + operationsDTO.getOperationDTOs().get(0).getDate().toString() +
+                                    "\nLibelle : " + operationsDTO.getOperationDTOs().get(0).getLibelleCourt() +
+                                    "\nMontant : " + operationsDTO.getOperationDTOs().get(0).getMontant().toString());
             }
         }catch (IOException e) {e.printStackTrace();}
 
@@ -229,7 +237,17 @@ public class MainActivity extends Activity {
     {
         String responseString = restClient.callGET("/utilisateurs/" + utilisateurDTO.getId()+ "/geolocalisation/agences/rechercherParCoordonnees" +
                 "?latitude=45.5391206" + "&longitude=4.870891571");
-        showAlertDialog("Géolocalisation", responseString);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            agencesDTO= mapper.readValue(responseString, AgencesDTO.class);
+            if(agencesDTO != null)
+            {
+                showAlertDialog("Géolocalisation", "Agence : " + agencesDTO.getAgence().get(0).getNom() +
+                        "\nCode postal : " + agencesDTO.getAgence().get(0).getAdresse().getCodePostal() + "\nTelephone : " +
+                        agencesDTO.getAgence().get(0).getTelephone().toString());
+            }
+        }catch (IOException e) {e.printStackTrace();}
+
     }
 
     private void deleteSession()

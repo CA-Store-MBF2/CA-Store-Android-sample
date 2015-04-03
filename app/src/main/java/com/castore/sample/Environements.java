@@ -1,4 +1,4 @@
-package com.harmonie.castorev2;
+package com.castore.sample;
 
 /**
  * Created by rlonguet on 31/03/2015.

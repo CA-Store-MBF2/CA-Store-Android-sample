@@ -4,7 +4,7 @@ android {
     buildToolsVersion "19.1.0"
 
     defaultConfig {
-        applicationId "com.harmonie.castorev2"
+        applicationId "com.castore.sample"
         minSdkVersion 9
         targetSdkVersion 19
         versionCode 1
@@ -34,7 +34,6 @@ dependencies {
     compile group: 'com.sun.jersey.contribs.jersey-oauth', name: 'oauth-signature', version: '1.1.5'
     compile group: 'oauth.signpost', name: 'signpost-commonshttp4', version: '1.2.1.2'
     compile group: 'oauth.signpost', name: 'signpost-core', version: '1.2.1.2'
-    compile files('libs/castore_auth_android_r201209171534.jar')
     // Librairie disponible dans la doc de castore à l'adresse suivante: https://www.creditagricolestore.fr/castore-data-provider/docs/V1/downloads.html#Client Java
     compile files('libs/simone-data-provider-webservice-json-client.jar')
 }

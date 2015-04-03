@@ -99,7 +99,6 @@
     <orderEntry type="library" exported="" name="appcompat-v7-19.1.0" level="project" />
     <orderEntry type="library" exported="" name="signpost-commonshttp4-1.2.1.2" level="project" />
     <orderEntry type="library" exported="" name="simone-data-provider-webservice-json-client" level="project" />
-    <orderEntry type="library" exported="" name="castore_auth_android_r201209171534" level="project" />
   </component>
 </module>
 

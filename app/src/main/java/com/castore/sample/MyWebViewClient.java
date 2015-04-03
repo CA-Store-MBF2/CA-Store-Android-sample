@@ -1,4 +1,4 @@
-package com.harmonie.castorev2;
+package com.castore.sample;
 
 import android.content.Context;
 import android.content.Intent;
