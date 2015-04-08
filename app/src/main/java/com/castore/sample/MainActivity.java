@@ -22,11 +22,14 @@ import android.widget.ListView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-
-import fr.creditagricole.simone.dataprovider.dto.json.AgenceDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.CompteBAMDTOList;
+import fr.creditagricole.simone.dataprovider.dto.json.CompteBeneficiaireDTO;
+import fr.creditagricole.simone.dataprovider.dto.json.CompteBeneficiaireDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.CompteDTOList;
+import fr.creditagricole.simone.dataprovider.dto.json.CompteEmetteurDTO;
+import fr.creditagricole.simone.dataprovider.dto.json.CompteEmetteurDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.OperationDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.UtilisateurDTO;
 import fr.creditagricole.simone.dataprovider.geolocalisation.dto.json.AgencesDTO;
@@ -42,7 +45,8 @@ import oauth.signpost.exception.OAuthNotAuthorizedException;
 
 public class MainActivity extends Activity {
 
-    public static final String SESSION="SESSION";
+    public static final String SESSION_START="SESSION_START";
+    public static final String SESSION_END="SESSION_END";
 
     private WebView myWebView;
     private ListView listView;
@@ -63,6 +67,9 @@ public class MainActivity extends Activity {
     private CompteDTOList comptesDTO;
     private OperationDTOList operationsDTO;
     private AgencesDTO agencesDTO;
+    private CompteEmetteurDTO emetteur;
+    private CompteBeneficiaireDTO beneficiaire;
+    private MyWebViewClient myWebClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +96,7 @@ public class MainActivity extends Activity {
         *  On utilise un BroadcastReceiver pour signaler quand la Webview rend
         * la main */
         filter = new IntentFilter();
-        filter.addAction(SESSION);
+        filter.addAction(SESSION_START);
         myReceiver = new MyBroadcastReceiver();
 
     }
@@ -164,7 +171,7 @@ public class MainActivity extends Activity {
         String uri = null;
         try {
             uri = provider.retrieveRequestToken(consumer, "http://google.fr");
-            Log.d("Uri", uri);
+            Log.d("Token_authent", uri);
         } catch (OAuthMessageSignerException e) {
             Log.d("UriError", e.getMessage());
         } catch (OAuthNotAuthorizedException e) {
@@ -174,8 +181,8 @@ public class MainActivity extends Activity {
         } catch (OAuthCommunicationException e) {
             Log.d("UriError", e.getMessage());
         };
-
-        myWebView.setWebViewClient(new MyWebViewClient(ctx, provider, consumer));
+        myWebClient = new MyWebViewClient(ctx, provider, consumer,"http://google.fr");
+        myWebView.setWebViewClient(myWebClient);
         myWebView.loadUrl(Environements.ENV_AUTHENT + uri);
 
     }
@@ -250,6 +257,72 @@ public class MainActivity extends Activity {
 
     }
 
+    private void virement()
+    {
+        myWebView.setVisibility(View.VISIBLE);
+        String responseString = restClient.callGET("/utilisateurs/" + utilisateurDTO.getId() + "/comptesBAM/" + comptesBAMDTO.getCompteBAMDTOs().get(0).getId()  +
+                "/comptesEmetteurs");
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            CompteEmetteurDTOList comptesEmetteur = mapper.readValue(responseString, CompteEmetteurDTOList.class);
+            if(comptesEmetteur != null)
+            {
+                emetteur = comptesEmetteur.getCompteEmetteurDTOs().get(1);
+            }
+        }catch (IOException e) {e.printStackTrace();}
+
+        responseString = restClient.callGET("/utilisateurs/" + utilisateurDTO.getId() + "/comptesBAM/" + comptesBAMDTO.getCompteBAMDTOs().get(0).getId()  +
+                "/comptesBeneficiaires");
+        mapper = new ObjectMapper();
+        try {
+            CompteBeneficiaireDTOList comptesBeneficiaires = mapper.readValue(responseString, CompteBeneficiaireDTOList.class);
+            if(comptesBeneficiaires != null)
+            {
+                beneficiaire = comptesBeneficiaires.getCompteBeneficiaireDTOs().get(0);
+            }
+        }catch (IOException e) {e.printStackTrace();}
+
+        String montant = "1";
+        String libelle = "lib";
+        String refOperation = "ref";
+        String uri=null;
+        try {
+            uri = provider.retrieveRequestToken(consumer, "http://bing.fr");
+        } catch (OAuthMessageSignerException e) {
+            Log.d("UriError", e.getMessage());
+        } catch (OAuthNotAuthorizedException e) {
+            Log.d("UriError", e.getMessage());
+        } catch (OAuthExpectationFailedException e) {
+            Log.d("UriError", e.getMessage());
+        } catch (OAuthCommunicationException e) {
+            Log.d("UriError", e.getMessage());
+        }
+        ;
+        String url = Environements.ENV_VIREMENT + "?" +
+                "identifiantCompteBAM=" + comptesBAMDTO.getCompteBAMDTOs().get(0).getId() + "&" +
+                "identifiantCompteEmetteur=" + emetteur.getId() + "&" +
+                "identifiantCompteBeneficiaire=" + beneficiaire.getId() + "&" +
+                "montant=" + montant + "&" +
+                "libelleVirement=" + libelle + "&" +
+                "refOperation=" + refOperation + "&" +
+                "redirectPage=http://bing.fr&" +
+                "oauth_token=" + uri.split("=")[1].toString();
+
+        try {
+            url = java.net.URLDecoder.decode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("URL_VIREMENT", url);
+        myWebClient.setCallback("http://bing.fr");
+        myWebView.setWebViewClient(myWebClient);
+        myWebView.loadUrl(url);
+
+
+    }
+
+
     private void deleteSession()
     {
         restClient.callDELETE("/session");
@@ -294,11 +367,11 @@ public class MainActivity extends Activity {
             }
             else if (Titre.equals(TitreDialogGeoloc))
             {
-                deleteSession();
+                virement();
             }
             else if(Titre.equals(TitreDeleteSession))
             {
-                myWebView.setVisibility(View.GONE);
+                deleteSession();
             }
             dialog.dismiss();
         }
@@ -307,9 +380,14 @@ public class MainActivity extends Activity {
     public class MyBroadcastReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(SESSION))
+            if(intent.getAction().equals(SESSION_START))
             {
                 session();
+            }
+            if(intent.getAction().equals(SESSION_END))
+            {
+                myWebView.setVisibility(View.GONE);
+                showAlertDialog("Session", "Session terminée");
             }
         }
     }

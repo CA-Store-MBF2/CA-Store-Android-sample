@@ -31,14 +31,21 @@ public class MyWebViewClient extends WebViewClient {
     private OAuthProvider provider;
     private OAuthConsumer consumer;
     private Context ctx;
+    private String callback;
 
 
-    public MyWebViewClient(Context ct, OAuthProvider prov,OAuthConsumer cons)
+    public void setCallback(String callback) {
+        this.callback = callback;
+    }
+
+    public MyWebViewClient(Context ct, OAuthProvider prov,OAuthConsumer cons, String cb)
     {
         provider = prov;
         consumer = cons;
         ctx = ct;
+        callback = cb;
     }
+
 
     public void onReceivedSslError (WebView view, SslErrorHandler handler, SslError error) {
         handler.proceed() ;
@@ -47,20 +54,20 @@ public class MyWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
-        if (url.startsWith("http://google.fr")) {
+        if (url.startsWith(callback) && callback.equals("http://google.fr")) {
             List<NameValuePair> parameters;
             try {
                 parameters = URLEncodedUtils.parse(new URI(url), "UTF-8");
                 String oauth_verifier = "";
                 for (NameValuePair p : parameters) {
-                    if (p.getName().equals("oauth_verifier"));
+                    if (p.getName().equals("oauth_verifier")) ;
                     oauth_verifier = p.getValue();
                 }
 
                 provider.retrieveAccessToken(consumer, oauth_verifier);
                 /*On envoit un intent à la MainActivity pour rendre la main*/
                 Intent startSession = new Intent();
-                startSession.setAction(MainActivity.SESSION);
+                startSession.setAction(MainActivity.SESSION_START);
                 /*Un LocalBroadcastManager est plus sécurisé pour des intent intra-application*/
                 LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(ctx);
                 broadcaster.sendBroadcast(startSession);
@@ -83,6 +90,18 @@ public class MyWebViewClient extends WebViewClient {
             }
             return true;
         }
+        else if (url.startsWith(callback) && callback.equals("http://bing.fr")) {
+
+            /*On envoit un intent à la MainActivity pour rendre la main*/
+            Intent startSession = new Intent();
+            startSession.setAction(MainActivity.SESSION_END);
+            /*Un LocalBroadcastManager est plus sécurisé pour des intent intra-application*/
+            LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(ctx);
+            broadcaster.sendBroadcast(startSession);
+
+            return true;
+        }
+
         return false;
     }
 
