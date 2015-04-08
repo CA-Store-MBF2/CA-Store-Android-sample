@@ -22,7 +22,11 @@ Importer.
 
 L'API CA Store: https://www.creditagricolestore.fr/castore-data-provider/docs/V1/
 
+## Notes
 
+Nous avons encore quelques problèmes avec la fonction "virement".
+
+Nous travaillons actuellement dessus, ce sera reglé rapidement.
 
 
 
