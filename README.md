@@ -7,6 +7,7 @@ Exemple d'utilisation de l'API CA Store avec Android.
 1. Java jdk
 2. Android Studio
 3. Android SDK (Télécharger API Level 19)
+4. Git
 
 ## Installation
 
