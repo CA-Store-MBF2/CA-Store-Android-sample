@@ -25,9 +25,9 @@ L'API CA Store: https://www.creditagricolestore.fr/castore-data-provider/docs/V1
 
 ## Notes
 
-Nous avons encore quelques problèmes avec la fonction "virement".
+Il est préférable de lancer l'application sur une version d'Android supérieure ou égale à Android 4.4.2 (API niveau 19).
 
-Nous travaillons actuellement dessus, ce sera reglé rapidement.
+En dessous l'application ne fonctionne pas correctement. 
 
 
 
