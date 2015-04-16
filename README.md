@@ -25,7 +25,7 @@ L'API CA Store: https://www.creditagricolestore.fr/castore-data-provider/docs/V1
 
 ## Notes
 
-Il est préférable de lancer l'application sur une version d'Android supérieure ou égale à Android 4.4.2 (API niveau 19).
+Il est préférable de lancer l'application sur une version d'Android supérieure ou égale à la 4.4.2 (API niveau 19).
 
 En dessous l'application ne fonctionne pas correctement. 
 
