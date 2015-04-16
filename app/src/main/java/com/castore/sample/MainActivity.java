@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -22,7 +23,6 @@ import android.widget.ListView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import fr.creditagricole.simone.dataprovider.dto.json.CompteBAMDTOList;
 import fr.creditagricole.simone.dataprovider.dto.json.CompteBeneficiaireDTO;
@@ -84,6 +84,8 @@ public class MainActivity extends Activity {
         myWebView.getSettings().setUseWideViewPort(true);
         myWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         myWebView.setScrollbarFadingEnabled(false);
+        WebSettings webSettings = myWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
 
         /*Initialisation de la listview*/
         listView = (ListView) this.findViewById(R.id.environement);
@@ -97,6 +99,7 @@ public class MainActivity extends Activity {
         * la main */
         filter = new IntentFilter();
         filter.addAction(SESSION_START);
+        filter.addAction(SESSION_END);
         myReceiver = new MyBroadcastReceiver();
 
     }
@@ -282,7 +285,7 @@ public class MainActivity extends Activity {
             }
         }catch (IOException e) {e.printStackTrace();}
 
-        String montant = "1";
+        String montant = "100";
         String libelle = "lib";
         String refOperation = "ref";
         String uri=null;
@@ -308,20 +311,11 @@ public class MainActivity extends Activity {
                 "redirectPage=http://bing.fr&" +
                 "oauth_token=" + uri.split("=")[1].toString();
 
-        try {
-            url = java.net.URLDecoder.decode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("URL_VIREMENT", url);
         myWebClient.setCallback("http://bing.fr");
         myWebView.setWebViewClient(myWebClient);
         myWebView.loadUrl(url);
 
-
     }
-
 
     private void deleteSession()
     {
@@ -371,7 +365,7 @@ public class MainActivity extends Activity {
             }
             else if(Titre.equals(TitreDeleteSession))
             {
-                deleteSession();
+                myWebView.setVisibility(View.GONE);
             }
             dialog.dismiss();
         }
@@ -386,8 +380,7 @@ public class MainActivity extends Activity {
             }
             if(intent.getAction().equals(SESSION_END))
             {
-                myWebView.setVisibility(View.GONE);
-                showAlertDialog("Session", "Session terminée");
+                deleteSession();
             }
         }
     }
