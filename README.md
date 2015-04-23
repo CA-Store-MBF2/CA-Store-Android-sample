@@ -15,7 +15,7 @@ L'application a été développée avec l’IDE Android Studio.
 
 Pour l’importer, lancer Android Studio -> VCS -> Checkout from Version Control -> Git
 
-Entrer l’adresse url github suivante : https://github.com/rapharmonie/CA-Store-example.git
+Entrer l’adresse url github suivante : https://github.com/CA-Store-MBF2/CA-Store-Android-sample.git
 
 Importer. 
 
