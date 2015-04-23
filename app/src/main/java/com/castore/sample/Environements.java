@@ -14,7 +14,5 @@ public class Environements {
         public static String ENV_VIREMENT = "https://www.creditagricolestore.fr/castore-data-provider/authentification/virement";
         public static String ENV_CHANGE = "https://www.creditagricolestore.fr/castore-data-provider/authentification/choixCompteBAM";
         public static String ENV_BASE = "https://www.creditagricolestore.fr/castore-data-provider/rest/V1";
-
-
 }
 

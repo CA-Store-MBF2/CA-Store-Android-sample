@@ -20,19 +20,21 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import fr.creditagricole.simone.dataprovider.dto.json.CompteBAMDTOList;
-import fr.creditagricole.simone.dataprovider.dto.json.CompteBeneficiaireDTO;
-import fr.creditagricole.simone.dataprovider.dto.json.CompteBeneficiaireDTOList;
-import fr.creditagricole.simone.dataprovider.dto.json.CompteDTOList;
-import fr.creditagricole.simone.dataprovider.dto.json.CompteEmetteurDTO;
-import fr.creditagricole.simone.dataprovider.dto.json.CompteEmetteurDTOList;
-import fr.creditagricole.simone.dataprovider.dto.json.OperationDTOList;
-import fr.creditagricole.simone.dataprovider.dto.json.UtilisateurDTO;
-import fr.creditagricole.simone.dataprovider.geolocalisation.dto.json.AgencesDTO;
+
+import fr.creditagricole.simone.dataprovider.dto.CompteBAMDTOList;
+import fr.creditagricole.simone.dataprovider.dto.CompteBeneficiaireDTO;
+import fr.creditagricole.simone.dataprovider.dto.CompteBeneficiaireDTOList;
+import fr.creditagricole.simone.dataprovider.dto.CompteDTOList;
+import fr.creditagricole.simone.dataprovider.dto.CompteEmetteurDTO;
+import fr.creditagricole.simone.dataprovider.dto.CompteEmetteurDTOList;
+import fr.creditagricole.simone.dataprovider.dto.OperationDTOList;
+import fr.creditagricole.simone.dataprovider.dto.UtilisateurDTO;
+import fr.creditagricole.simone.dataprovider.geolocalisation.dto.AgencesDTO;
 import oauth.signpost.OAuthProvider;
 import oauth.signpost.basic.DefaultOAuthProvider;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
@@ -70,6 +72,7 @@ public class MainActivity extends Activity {
     private CompteEmetteurDTO emetteur;
     private CompteBeneficiaireDTO beneficiaire;
     private MyWebViewClient myWebClient;
+    private ObjectMapper mapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,11 @@ public class MainActivity extends Activity {
         myWebView.setScrollbarFadingEnabled(false);
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+
+        /*Initialisation du mapper*/
+        mapper = new ObjectMapper();
+        /*Pour éviter une erreur si on nous retourne un JSON avec un(des) attribut(s) en plus*/
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         /*Initialisation de la listview*/
         listView = (ListView) this.findViewById(R.id.environement);
@@ -196,7 +204,6 @@ public class MainActivity extends Activity {
                 Environements.ENV_APP_SECRET, Environements.ENV_BASE);
         String responseString = restClient.callGET("/session");
 
-        ObjectMapper mapper = new ObjectMapper();
         try {
             utilisateurDTO = mapper.readValue(responseString, UtilisateurDTO.class);
             if(utilisateurDTO != null)
@@ -210,7 +217,7 @@ public class MainActivity extends Activity {
     private void seeComptes()
     {
         String responseString = restClient.callGET("/utilisateurs/" + utilisateurDTO.getId() + "/comptesBAM");
-        ObjectMapper mapper = new ObjectMapper();
+
         try {
             comptesBAMDTO = mapper.readValue(responseString, CompteBAMDTOList.class);
             if(comptesBAMDTO != null)
@@ -230,7 +237,6 @@ public class MainActivity extends Activity {
     {
         String responseString = restClient.callGET("/utilisateurs/" + utilisateurDTO.getId() + "/comptesBAM/" + comptesBAMDTO.getCompteBAMDTOs().get(0).getId()  +
                 "/comptes/" + comptesDTO.getCompteDTOs().get(0).getId() + "/operations");
-        ObjectMapper mapper = new ObjectMapper();
         try {
             operationsDTO= mapper.readValue(responseString, OperationDTOList.class);
             if(operationsDTO != null)
@@ -247,7 +253,6 @@ public class MainActivity extends Activity {
     {
         String responseString = restClient.callGET("/utilisateurs/" + utilisateurDTO.getId()+ "/geolocalisation/agences/rechercherParCoordonnees" +
                 "?latitude=45.5391206" + "&longitude=4.870891571");
-        ObjectMapper mapper = new ObjectMapper();
         try {
             agencesDTO= mapper.readValue(responseString, AgencesDTO.class);
             if(agencesDTO != null)
@@ -265,7 +270,6 @@ public class MainActivity extends Activity {
         myWebView.setVisibility(View.VISIBLE);
         String responseString = restClient.callGET("/utilisateurs/" + utilisateurDTO.getId() + "/comptesBAM/" + comptesBAMDTO.getCompteBAMDTOs().get(0).getId()  +
                 "/comptesEmetteurs");
-        ObjectMapper mapper = new ObjectMapper();
         try {
             CompteEmetteurDTOList comptesEmetteur = mapper.readValue(responseString, CompteEmetteurDTOList.class);
             if(comptesEmetteur != null)
@@ -276,7 +280,7 @@ public class MainActivity extends Activity {
 
         responseString = restClient.callGET("/utilisateurs/" + utilisateurDTO.getId() + "/comptesBAM/" + comptesBAMDTO.getCompteBAMDTOs().get(0).getId()  +
                 "/comptesBeneficiaires");
-        mapper = new ObjectMapper();
+
         try {
             CompteBeneficiaireDTOList comptesBeneficiaires = mapper.readValue(responseString, CompteBeneficiaireDTOList.class);
             if(comptesBeneficiaires != null)

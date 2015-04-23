@@ -27,13 +27,13 @@ android {
     }
 }
 dependencies {
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.1.2'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.2.1'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.2.1'
-    compile group: 'com.sun.jersey.contribs.jersey-oauth', name: 'oauth-client', version: '1.13'
-    compile group: 'com.sun.jersey.contribs.jersey-oauth', name: 'oauth-signature', version: '1.1.5'
-    compile group: 'oauth.signpost', name: 'signpost-commonshttp4', version: '1.2.1.2'
-    compile group: 'oauth.signpost', name: 'signpost-core', version: '1.2.1.2'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.1.2'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.2.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.2.1'
+    compile 'com.sun.jersey.contribs.jersey-oauth:oauth-client:1.13'
+    compile 'com.sun.jersey.contribs.jersey-oauth:oauth-signature:1.1.5'
+    compile 'oauth.signpost:signpost-commonshttp4:1.2.1.2'
+    compile 'oauth.signpost:signpost-core:1.2.1.2'
     // Librairie disponible dans la doc de castore à l'adresse suivante: https://www.creditagricolestore.fr/castore-data-provider/docs/V1/downloads.html#Client Java
-    compile files('libs/simone-data-provider-webservice-json-client.jar')
+    compile files('libs/simone-data-provider-webservice-client.jar')
 }
